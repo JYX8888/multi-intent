@@ -1,0 +1,359 @@
+[
+  {
+    "id": 1,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "weight",
+      "sleep",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "sleep",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1396,
+    "body": {
+      "diet": true,
+      "diet_content": "早餐吃了一个肉包和一杯豆浆",
+      "weight": true,
+      "weight_content": "72.6公斤，比上周轻了一公斤",
+      "ketone": false,
+      "ketone_content": null,
+      "exercise": false,
+      "exercise_content": null,
+      "sleep": true,
+      "sleep_content": "昨晚两点多才睡，今天特别困",
+      "health_faq": true,
+      "health_faq_content": "早餐是不是吃得有点多"
+    }
+  },
+  {
+    "id": 2,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "ketone",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "ketone",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1421,
+    "body": {
+      "diet": true,
+      "diet_content": "中午吃了半碗米饭、红烧肉和青菜",
+      "weight": false,
+      "weight_content": null,
+      "ketone": true,
+      "ketone_content": "尿酮从一个加号降到三个加号",
+      "exercise": false,
+      "exercise_content": null,
+      "sleep": false,
+      "sleep_content": null,
+      "health_faq": true,
+      "health_faq_content": "是不是因为吃米饭导致尿酮下降了"
+    }
+  },
+  {
+    "id": 3,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "weight",
+      "sleep",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "sleep",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [
+      "diet"
+    ],
+    "elapsedMs": 1548,
+    "body": {
+      "diet": true,
+      "diet_content": "昨天晚上没吃东西",
+      "weight": true,
+      "weight_content": "早上体重58.9kg，比昨天重了0.4kg",
+      "ketone": false,
+      "ketone_content": null,
+      "exercise": false,
+      "exercise_content": null,
+      "sleep": true,
+      "sleep_content": "昨晚十一点睡的，早上六点半醒，中间醒了两次",
+      "health_faq": true,
+      "health_faq_content": "为什么昨晚没吃东西反而涨了"
+    }
+  },
+  {
+    "id": 4,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "exercise",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "ketone",
+      "exercise",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [
+      "weight",
+      "ketone"
+    ],
+    "elapsedMs": 1302,
+    "body": {
+      "diet": true,
+      "diet_content": "早上只喝了一杯黑咖啡，中午准备吃牛肉和西兰花",
+      "weight": true,
+      "weight_content": "今天没称体重",
+      "ketone": true,
+      "ketone_content": "没有测尿酮",
+      "exercise": true,
+      "exercise_content": "晚上慢跑半个小时",
+      "sleep": false,
+      "sleep_content": null,
+      "health_faq": true,
+      "health_faq_content": "这样安排可以吗？"
+    }
+  },
+  {
+    "id": 5,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "weight",
+      "ketone",
+      "exercise",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "ketone",
+      "exercise",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1377,
+    "body": {
+      "diet": true,
+      "diet_content": "早餐吃了两个水煮蛋",
+      "weight": true,
+      "weight_content": "体重67.5公斤",
+      "ketone": true,
+      "ketone_content": "尿酮试纸颜色大概是“+”",
+      "exercise": true,
+      "exercise_content": "上午走了八千步",
+      "sleep": false,
+      "sleep_content": null,
+      "health_faq": true,
+      "health_faq_content": "帮我看看今天状态怎么样"
+    }
+  },
+  {
+    "id": 6,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "weight",
+      "ketone",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "ketone",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1481,
+    "body": {
+      "diet": true,
+      "diet_content": "聚餐吃了火锅、两片西瓜，还喝了一杯饮料",
+      "weight": true,
+      "weight_content": "体重涨了0.8公斤",
+      "ketone": true,
+      "ketone_content": "尿酮从“++”变成阴性",
+      "exercise": false,
+      "exercise_content": null,
+      "sleep": false,
+      "sleep_content": null,
+      "health_faq": true,
+      "health_faq_content": "我是不是已经退出生酮状态了，今天应该怎么调整？"
+    }
+  },
+  {
+    "id": 7,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "weight",
+      "exercise",
+      "sleep",
+      "health_faq"
+    ],
+    "actual": [
+      "weight",
+      "exercise",
+      "sleep",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1573,
+    "body": {
+      "diet": false,
+      "diet_content": null,
+      "weight": true,
+      "weight_content": "体重一直卡在65公斤没变化",
+      "ketone": false,
+      "ketone_content": null,
+      "exercise": true,
+      "exercise_content": "每天晚上都会跳操40分钟",
+      "sleep": true,
+      "sleep_content": "最近三天每天只睡五六个小时",
+      "health_faq": true,
+      "health_faq_content": "是不是运动量太大或者睡眠影响了减重"
+    }
+  },
+  {
+    "id": 8,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "weight",
+      "ketone",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "ketone",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1359,
+    "body": {
+      "diet": true,
+      "diet_content": "早饭没吃，中午吃了一份鸡胸肉沙拉",
+      "weight": true,
+      "weight_content": "体重比昨天少了0.6公斤",
+      "ketone": true,
+      "ketone_content": "测尿酮是“+++”",
+      "exercise": false,
+      "exercise_content": null,
+      "sleep": false,
+      "sleep_content": null,
+      "health_faq": true,
+      "health_faq_content": "这种情况正常吗？"
+    }
+  },
+  {
+    "id": 9,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "exercise",
+      "sleep",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "exercise",
+      "sleep",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [],
+    "elapsedMs": 1303,
+    "body": {
+      "diet": true,
+      "diet_content": "想吃鸡蛋、牛奶和一根玉米",
+      "weight": false,
+      "weight_content": null,
+      "ketone": false,
+      "ketone_content": null,
+      "exercise": true,
+      "exercise_content": "晚上计划游泳一个小时",
+      "sleep": true,
+      "sleep_content": "入睡困难，经常十二点后睡",
+      "health_faq": true,
+      "health_faq_content": "这样会影响启动期吗"
+    }
+  },
+  {
+    "id": 10,
+    "status": 200,
+    "jsonValid": true,
+    "schemaValid": true,
+    "expected": [
+      "diet",
+      "weight",
+      "sleep",
+      "health_faq"
+    ],
+    "actual": [
+      "diet",
+      "weight",
+      "exercise",
+      "sleep",
+      "health_faq"
+    ],
+    "missing": [],
+    "unexpected": [
+      "exercise"
+    ],
+    "elapsedMs": 1430,
+    "body": {
+      "diet": true,
+      "diet_content": "早餐吃了煎蛋和全麦面包",
+      "weight": true,
+      "weight_content": "体重是70.2kg",
+      "ketone": false,
+      "ketone_content": null,
+      "exercise": true,
+      "exercise_content": "今天没有运动",
+      "sleep": true,
+      "sleep_content": "昨晚睡了7个小时",
+      "health_faq": true,
+      "health_faq_content": "中午吃什么更合适"
+    }
+  }
+]

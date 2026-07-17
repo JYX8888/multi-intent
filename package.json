@@ -1,0 +1,25 @@
+{
+  "name": "multi-intent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "prototype": "tsc && node dist/src/prototype.js",
+    "prototype:real": "tsc && node dist/src/prototype-real.js",
+    "start": "tsc && node dist/src/index.js",
+    "test": "tsc && node dist/tests/intent-schema.test.js && node dist/tests/intent-service.test.js && node dist/tests/http-server.test.js"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=22.19.0",
+    "npm": ">=10"
+  },
+  "dependencies": {
+    "@earendil-works/pi-agent-core": "0.80.7",
+    "@earendil-works/pi-ai": "0.80.7"
+  }
+}
