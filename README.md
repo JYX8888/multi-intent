@@ -1,146 +1,155 @@
-# multi-intent
+# multi-intent 意图识别服务接入说明
 
-`multi-intent` 是一个基于 Pi Agent Core 的多意图识别 HTTP 服务。它只负责接收一段健康管理文本，输出固定 JSON 计划，供后续 Dify 工作流调用。
+`multi-intent` 是一个健康管理多意图识别 HTTP 服务。调用方传入一段用户原始文本，服务返回固定 JSON，用于判断后续需要进入哪些 Dify 工作流分支。
 
-## 功能
+服务只做意图识别和内容提取，不生成健康建议，不调用业务工作流，也不返回最终用户回复。
 
-- `POST /intent-plan`：多意图识别并返回固定 JSON
-- `GET /health/live`：进程存活检查
-- `GET /health/ready`：配置就绪检查
-- 请求级 `AbortSignal`、超时和优雅关闭
-- HTTP Token 鉴权
+## 服务能力
 
-## 运行环境
+当前识别 6 类意图：
 
-- Node.js 22+
-- npm 10+
-- Pi 模型服务可用
+| 字段 | 含义 |
+|---|---|
+| `diet` | 饮食、食物、餐食、没吃饭等饮食相关信息 |
+| `weight` | 体重、称重、体重变化 |
+| `ketone` | 尿酮、酮体、试纸结果 |
+| `exercise` | 运动、锻炼、步数、运动计划 |
+| `sleep` | 睡眠时间、睡眠质量、入睡困难 |
+| `health_faq` | 用户提出的健康管理问题或咨询 |
 
-## 安装
+每个意图都有一个对应的内容字段：
 
-本项目已经使用 npm 版本的 Pi 依赖，不需要在生产环境或 Git 仓库中包含同级 `pi/` 源码目录。
-
-```bash
-npm ci
+```text
+diet_content
+weight_content
+ketone_content
+exercise_content
+sleep_content
+health_faq_content
 ```
 
-## 本地启动
+规则：
 
-1. 创建 `.env`
-2. 填入环境变量
-3. 启动服务
+- 如果某类意图存在，对应布尔字段为 `true`，对应 `*_content` 为文本摘要。
+- 如果某类意图不存在，对应布尔字段为 `false`，对应 `*_content` 为 `null`。
+- `*_content` 是基于用户原文提取的简短摘要，可能不是逐字截取。
+- 用户说“没吃饭”“没有运动”“没测尿酮”等否定表达时，如果这些信息对业务分支有意义，也会作为对应内容返回。
 
-```bash
-npm start
+## 输入限制
+
+当前接口只接收文本，不直接接收图片、音频或文件。
+
+如果用户上传午餐照片、尿酮试纸照片等图片，需要先由 Dify 或上游视觉/OCR 服务将图片转换成文字描述，再把文字描述传给本服务。
+
+示例：
+
+```json
+{
+  "message": "用户上传了一张午餐照片，图片中有一碗牛肉面和一份青菜"
+}
 ```
 
-默认监听 `0.0.0.0:3000`。
+当前服务可以识别上述文字中的饮食意图；但不能直接识别图片本身。
 
-## .env 写法
+## 接口地址
 
-不要把真实密钥提交到 Git。生产环境也可以继续使用环境变量注入，`.env` 只用于本机或受控环境。
-
-```dotenv
-PORT=3000
-HOST=0.0.0.0
-MODEL_PROVIDER=deepseek
-MODEL_NAME=deepseek-v4-flash
-MODEL_API_KEY=your-model-api-key
-INTENT_API_TOKEN=your-intent-token
-REQUEST_TIMEOUT_MS=10000
-MODEL_TIMEOUT_MS=8000
-SHUTDOWN_GRACE_MS=10000
+```http
+POST /intent-plan
 ```
 
-说明：
+完整地址由部署方提供，例如：
 
-- `MODEL_PROVIDER` / `MODEL_NAME`：Pi 模型标识
-- `MODEL_API_KEY`：模型服务密钥
-- `INTENT_API_TOKEN`：调用 `POST /intent-plan` 的内部鉴权 Token
-- `REQUEST_TIMEOUT_MS`：整请求超时
-- `MODEL_TIMEOUT_MS`：模型调用超时
-- `SHUTDOWN_GRACE_MS`：优雅关闭宽限时间
-
-## HTTP 调用方式
-
-### 1. 意图识别
-
-```bash
-curl -X POST http://127.0.0.1:3000/intent-plan \
-  -H 'Content-Type: application/json' \
-  -H 'X-Intent-Token: your-intent-token' \
-  -d '{"message":"今天80kg，尿酮2+，中午吃牛肉面，昨晚睡了5小时"}'
+```text
+http://your-host:3000/intent-plan
 ```
 
-也可以使用 Bearer 方式：
+## 鉴权方式
 
-```bash
-curl -X POST http://127.0.0.1:3000/intent-plan \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer your-intent-token' \
-  -d '{"message":"今天80kg，尿酮2+，中午吃牛肉面，昨晚睡了5小时"}'
+使用 Bearer Token。
+
+请求头：
+
+```http
+Authorization: Bearer <token>
 ```
 
-返回示例：
+未携带 Token 或 Token 错误时，服务返回：
+
+```json
+{
+  "error": "Unauthorized",
+  "request_id": "..."
+}
+```
+
+## 请求格式
+
+```json
+{
+  "message": "今天80kg，尿酮2+，中午吃牛肉面，昨晚睡了5小时"
+}
+```
+
+字段说明：
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `message` | string | 是 | 用户原始输入文本 |
+
+## 返回格式
+
+成功时返回：
 
 ```json
 {
   "diet": true,
   "diet_content": "中午吃牛肉面",
   "weight": true,
-  "weight_content": "今天80kg",
+  "weight_content": "80kg",
   "ketone": true,
   "ketone_content": "尿酮2+",
   "exercise": false,
   "exercise_content": null,
   "sleep": true,
-  "sleep_content": "昨晚睡了5小时",
+  "sleep_content": "睡了5小时",
   "health_faq": false,
   "health_faq_content": null
 }
 ```
 
-### 2. 健康检查
+返回字段固定为 12 个字段，不会返回额外字段。
+
+## 调用示例
 
 ```bash
-curl http://127.0.0.1:3000/health/live
-curl http://127.0.0.1:3000/health/ready
+curl -X POST http://your-host:3000/intent-plan \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer your-token' \
+  -d '{"message":"今天80kg，尿酮2+，中午吃牛肉面，昨晚睡了5小时"}'
 ```
 
-## 生产部署建议
+## Dify HTTP 节点配置
 
-当前版本未提供 Dockerfile 或 Kubernetes YAML。生产环境建议采用以下方式之一：
+### Method
 
-### 方案 A：systemd + Node.js
-
-1. 在服务器上安装 Node.js 22+
-2. 部署代码到固定目录
-3. 通过环境变量或受控 `.env` 提供配置
-4. 使用 `npm ci` 和 `npm run build` 构建
-5. 用 systemd 启动 `npm start`
-
-示例流程：
-
-```bash
-npm ci
-npm run build
-npm start
+```text
+POST
 ```
 
-建议配合 systemd 管理重启、日志和开机自启。
+### URL
 
-### 方案 B：进程管理器
+```text
+http://your-host:3000/intent-plan
+```
 
-也可以使用 PM2、supervisord 之类的进程管理器，让服务保持常驻，并在崩溃后自动拉起。
+### Headers
 
-## Dify 对接
+```text
+Content-Type: application/json
+Authorization: Bearer your-token
+```
 
-Dify 的 HTTP 节点调用本服务时：
-
-- Method：`POST`
-- URL：`http://your-host:3000/intent-plan`
-- Header：`X-Intent-Token: <token>`
-- Body：
+### Body
 
 ```json
 {
@@ -148,28 +157,118 @@ Dify 的 HTTP 节点调用本服务时：
 }
 ```
 
-Dify 后续节点直接读取返回 JSON 中的六个布尔字段和六个内容字段即可。
+其中 `{{用户输入}}` 请替换为 Dify 中实际代表用户消息的变量。
 
-## 测试
+## Dify 后续分支建议
 
-```bash
-npm run typecheck
-npm test
+Dify 可以根据返回的布尔字段决定是否进入对应工作流：
+
+```text
+diet == true          → 饮食点评工作流
+weight == true        → 体重点评工作流
+ketone == true        → 尿酮点评工作流
+exercise == true      → 运动点评工作流
+sleep == true         → 睡眠点评工作流
+health_faq == true    → 常见问题处理工作流
 ```
 
-测试会使用本地 faux provider，不会调用真实模型。
+各分支可以使用对应的 `*_content` 作为该分支的输入内容。
 
-## 代码位置
+例如：
 
-- Prompt：`src/agent/intent-planner-prompt.ts`
-- Agent 初始化：`src/agent/intent-agent.ts`
-- 请求处理：`src/api/routes.ts`
-- Schema 校验：`src/schema/intent-schema.ts`
-- 服务入口：`src/index.ts`
+```text
+diet_content → 饮食点评输入
+weight_content → 体重点评输入
+ketone_content → 尿酮点评输入
+```
 
-## 注意事项
+## 更多示例
 
-- 不要提交 `.env`
-- 不要把真实健康数据写进日志
-- 不要在公开环境暴露未鉴权的 `POST /intent-plan`
-- 当前服务只负责意图识别，不负责 Dify、Tool Calling 或最终回复生成
+### 多意图输入
+
+请求：
+
+```json
+{
+  "message": "早餐吃了两个鸡蛋，今天体重67.5公斤，尿酮试纸是+，上午走了八千步"
+}
+```
+
+可能返回：
+
+```json
+{
+  "diet": true,
+  "diet_content": "早餐吃了两个鸡蛋",
+  "weight": true,
+  "weight_content": "体重67.5公斤",
+  "ketone": true,
+  "ketone_content": "尿酮试纸是+",
+  "exercise": true,
+  "exercise_content": "上午走了八千步",
+  "sleep": false,
+  "sleep_content": null,
+  "health_faq": false,
+  "health_faq_content": null
+}
+```
+
+### 否定表达
+
+请求：
+
+```json
+{
+  "message": "今天没称体重，也没有测尿酮，中午准备吃牛肉和西兰花，晚上想慢跑半小时"
+}
+```
+
+可能返回：
+
+```json
+{
+  "diet": true,
+  "diet_content": "中午准备吃牛肉和西兰花",
+  "weight": true,
+  "weight_content": "今天没称体重",
+  "ketone": true,
+  "ketone_content": "没有测尿酮",
+  "exercise": true,
+  "exercise_content": "晚上想慢跑半小时",
+  "sleep": false,
+  "sleep_content": null,
+  "health_faq": false,
+  "health_faq_content": null
+}
+```
+
+## 错误返回
+
+### 未授权
+
+```json
+{
+  "error": "Unauthorized",
+  "request_id": "..."
+}
+```
+
+### 请求格式错误
+
+```json
+{
+  "error": "message must be a non-empty string",
+  "request_id": "..."
+}
+```
+
+### 服务或模型异常
+
+```json
+{
+  "error": "Model request failed.",
+  "request_id": "..."
+}
+```
+
+调用方应根据 HTTP 状态码和 `error` 字段做兜底处理。
