@@ -3,6 +3,7 @@ export type AppConfig = {
   port: number;
   modelProvider: string;
   modelName: string;
+  modelBaseUrl: string;
   modelApiKey: string;
   intentApiToken: string;
   requestTimeoutMs: number;
@@ -19,6 +20,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     port: readPositiveInteger(env.PORT, 3000),
     modelProvider: env.MODEL_PROVIDER?.trim() || "deepseek",
     modelName: env.MODEL_NAME?.trim() || "deepseek-v4-flash",
+    modelBaseUrl: readOptionalHttpUrl(env.MODEL_BASE_URL),
     modelApiKey: env.MODEL_API_KEY?.trim() || env.DEEPSEEK_API_KEY?.trim() || "",
     intentApiToken: env.INTENT_API_TOKEN?.trim() || "",
     requestTimeoutMs: readPositiveInteger(env.REQUEST_TIMEOUT_MS, 10_000),
@@ -28,6 +30,19 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     maxQueueSize: readPositiveInteger(env.MAX_QUEUE_SIZE, 500),
     queueTimeoutMs: readPositiveInteger(env.QUEUE_TIMEOUT_MS, 30_000),
   };
+}
+
+function readOptionalHttpUrl(value: string | undefined): string {
+  const url = value?.trim();
+  if (!url) return "";
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error("Unsupported protocol");
+    return url;
+  } catch {
+    throw new Error("MODEL_BASE_URL must be a valid http or https URL.");
+  }
 }
 
 export function getMissingReadyConfig(config: AppConfig): string[] {

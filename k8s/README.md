@@ -26,6 +26,9 @@ docker push <registry>/multi-intent:<tag>
 先在本地创建不提交 Git 的配置文件，例如 `.env.production`：
 
 ```dotenv
+MODEL_PROVIDER=qwen
+MODEL_NAME=qwen-plus
+MODEL_BASE_URL=https://your-openai-compatible-api-root/v1
 MODEL_API_KEY=replace-with-model-api-key
 INTENT_API_TOKEN=replace-with-intent-api-token
 ```
@@ -38,7 +41,7 @@ kubectl -n multi-intent create secret generic multi-intent-runtime-config \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-`.env.production` 不应提交 Git，也不应复制进镜像。非敏感配置仍由 `configmap.yaml` 管理。
+`MODEL_BASE_URL` 必须是 OpenAI 兼容 API 的根地址，通常以 `/v1` 结尾；不要填写完整的 `/chat/completions` 路径。`.env.production` 不应提交 Git，也不应复制进镜像。端口、超时和并发参数仍由 `configmap.yaml` 管理。
 
 ## 部署
 

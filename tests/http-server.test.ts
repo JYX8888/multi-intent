@@ -10,6 +10,7 @@ const config: AppConfig = {
   port: 0,
   modelProvider: "deepseek",
   modelName: "deepseek-v4-flash",
+  modelBaseUrl: "",
   modelApiKey: "test-only",
   intentApiToken: "test-token",
   requestTimeoutMs: 1000,

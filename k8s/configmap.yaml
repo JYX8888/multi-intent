@@ -8,8 +8,6 @@ metadata:
 data:
   PORT: "3000"
   HOST: "0.0.0.0"
-  MODEL_PROVIDER: "deepseek"
-  MODEL_NAME: "deepseek-v4-flash"
   REQUEST_TIMEOUT_MS: "10000"
   MODEL_TIMEOUT_MS: "8000"
   SHUTDOWN_GRACE_MS: "30000"

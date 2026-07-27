@@ -10,6 +10,8 @@ Kubernetes 部署方式请参阅 [k8s/README.md](k8s/README.md)。
 
 服务启动时会自动读取项目目录中的 `.env`，无需先执行 `source .env`。以 `.env.example` 为模板配置 `MODEL_API_KEY` 与 `INTENT_API_TOKEN`；真实 `.env` 已被 Git 忽略，不会提交到仓库。
 
+若使用 Qwen、DeepSeek 代理或其他 OpenAI 兼容厂商，请配置 `MODEL_PROVIDER`、`MODEL_NAME` 和 `MODEL_BASE_URL`。`MODEL_BASE_URL` 填写 API 根地址，通常为 `https://host/v1`，不要填写 `/chat/completions` 完整路径。
+
 ## 服务能力
 
 当前识别 6 类意图：

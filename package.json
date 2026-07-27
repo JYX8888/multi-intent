@@ -9,7 +9,7 @@
     "prototype": "tsc && node dist/src/prototype.js",
     "prototype:real": "tsc && node dist/src/prototype-real.js",
     "start": "tsc && node dist/src/index.js",
-    "test": "tsc && node dist/tests/intent-schema.test.js && node dist/tests/intent-service.test.js && node dist/tests/http-server.test.js && node dist/tests/concurrency-limiter.test.js && node dist/tests/env-file.test.js"
+    "test": "tsc && node dist/tests/intent-schema.test.js && node dist/tests/intent-service.test.js && node dist/tests/http-server.test.js && node dist/tests/concurrency-limiter.test.js && node dist/tests/env-file.test.js && node dist/tests/intent-agent.test.js"
   },
   "devDependencies": {
     "typescript": "5.9.3"
