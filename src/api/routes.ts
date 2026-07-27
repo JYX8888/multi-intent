@@ -10,6 +10,7 @@ export type RouteDependencies = {
   config: AppConfig;
   intentService: IntentService;
   logger: Logger;
+  isDraining?: () => boolean;
   onRequestStart?: () => void;
   onRequestFinish?: () => void;
 };
@@ -29,7 +30,8 @@ export async function handleRequest(
 
   if (request.method === "GET" && request.url === "/health/ready") {
     const missing = getMissingReadyConfig(dependencies.config);
-    writeJson(response, missing.length === 0 ? 200 : 503, { status: missing.length === 0 ? "ready" : "not_ready" });
+    const ready = missing.length === 0 && !dependencies.isDraining?.();
+    writeJson(response, ready ? 200 : 503, { status: ready ? "ready" : "not_ready" });
     return;
   }
 
@@ -111,6 +113,8 @@ function constantTimeEqual(left: string, right: string): boolean {
 function getStatus(error: BodyError | IntentServiceError): number {
   if (error instanceof BodyError) return 400;
   if (error.code === "aborted") return 408;
+  if (error.code === "queue_timeout") return 503;
+  if (error.code === "queue_full") return 503;
   return 502;
 }
 

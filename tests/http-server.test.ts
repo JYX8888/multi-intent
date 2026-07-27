@@ -15,6 +15,9 @@ const config: AppConfig = {
   requestTimeoutMs: 1000,
   modelTimeoutMs: 800,
   shutdownGraceMs: 1000,
+  maxModelConcurrency: 100,
+  maxQueueSize: 500,
+  queueTimeoutMs: 30_000,
 };
 
 const emptyPlan: IntentPlan = {
@@ -76,6 +79,23 @@ try {
   console.log("http-server.test.ts passed");
 } finally {
   await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
+}
+
+const drainingServer = createHttpServer({
+  config,
+  intentService,
+  logger: { info() {}, error() {} },
+  isDraining: () => true,
+});
+
+await new Promise<void>((resolve) => drainingServer.listen(0, "127.0.0.1", () => resolve()));
+const drainingAddress = drainingServer.address();
+assert.ok(drainingAddress && typeof drainingAddress !== "string");
+try {
+  const notReady = await call(drainingAddress.port, "GET", "/health/ready");
+  assert.equal(notReady.status, 503);
+} finally {
+  await new Promise<void>((resolve, reject) => drainingServer.close((error) => (error ? reject(error) : resolve())));
 }
 
 type Response = { status: number; body: Record<string, unknown> };

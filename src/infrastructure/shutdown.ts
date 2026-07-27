@@ -6,12 +6,14 @@ export function installGracefulShutdown(
   graceMs: number,
   getInFlight: () => number,
   logger: Logger,
+  onShutdownStart?: () => void,
 ): void {
   let shuttingDown = false;
 
   const shutdown = (signal: string) => {
     if (shuttingDown) return;
     shuttingDown = true;
+    onShutdownStart?.();
     logger.info("shutdown started", { signal });
     server.close(() => {
       logger.info("shutdown completed");

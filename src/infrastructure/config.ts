@@ -8,6 +8,9 @@ export type AppConfig = {
   requestTimeoutMs: number;
   modelTimeoutMs: number;
   shutdownGraceMs: number;
+  maxModelConcurrency: number;
+  maxQueueSize: number;
+  queueTimeoutMs: number;
 };
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -21,6 +24,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     requestTimeoutMs: readPositiveInteger(env.REQUEST_TIMEOUT_MS, 10_000),
     modelTimeoutMs: readPositiveInteger(env.MODEL_TIMEOUT_MS, 8_000),
     shutdownGraceMs: readPositiveInteger(env.SHUTDOWN_GRACE_MS, 10_000),
+    maxModelConcurrency: readPositiveInteger(env.MAX_MODEL_CONCURRENCY, 100),
+    maxQueueSize: readPositiveInteger(env.MAX_QUEUE_SIZE, 500),
+    queueTimeoutMs: readPositiveInteger(env.QUEUE_TIMEOUT_MS, 30_000),
   };
 }
 

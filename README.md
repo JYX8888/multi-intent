@@ -4,6 +4,12 @@
 
 服务只做意图识别和内容提取，不生成健康建议，不调用业务工作流，也不返回最终用户回复。
 
+Kubernetes 部署方式请参阅 [k8s/README.md](k8s/README.md)。
+
+## 服务配置
+
+服务启动时会自动读取项目目录中的 `.env`，无需先执行 `source .env`。以 `.env.example` 为模板配置 `MODEL_API_KEY` 与 `INTENT_API_TOKEN`；真实 `.env` 已被 Git 忽略，不会提交到仓库。
+
 ## 服务能力
 
 当前识别 6 类意图：
