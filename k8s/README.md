@@ -29,6 +29,8 @@ docker push <registry>/multi-intent:<tag>
 MODEL_PROVIDER=qwen
 MODEL_NAME=qwen-plus
 MODEL_BASE_URL=https://your-openai-compatible-api-root/v1
+MODEL_THINKING_FORMAT=enable_thinking
+MODEL_THINKING_LEVEL=off
 MODEL_API_KEY=replace-with-model-api-key
 INTENT_API_TOKEN=replace-with-intent-api-token
 ```
@@ -41,7 +43,7 @@ kubectl -n multi-intent create secret generic multi-intent-runtime-config \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-`MODEL_BASE_URL` 必须是 OpenAI 兼容 API 的根地址，通常以 `/v1` 结尾；不要填写完整的 `/chat/completions` 路径。`.env.production` 不应提交 Git，也不应复制进镜像。端口、超时和并发参数仍由 `configmap.yaml` 管理。
+`MODEL_BASE_URL` 必须是 OpenAI 兼容 API 的根地址，通常以 `/v1` 结尾；不要填写完整的 `/chat/completions` 路径。`MODEL_THINKING_FORMAT` 支持 `auto`、`enable_thinking`、`thinking`、`qwen`、`deepseek` 和 `none`。DeepSeek 官方及采用同类协议的平台使用 `thinking`；阿里云百炼/DashScope 托管的 Qwen 和 DeepSeek 模型均使用 `enable_thinking`，`auto` 可以依据 Provider 或百炼 Base URL 自动选择。`MODEL_THINKING_LEVEL=off` 会分别发送 `thinking: { "type": "disabled" }` 或 `enable_thinking: false`。无法自动识别的第三方模型必须显式配置协议，否则 Pod 会启动失败并保持未就绪。`.env.production` 不应提交 Git，也不应复制进镜像。端口、超时和并发参数仍由 `configmap.yaml` 管理。
 
 ## 部署
 

@@ -12,6 +12,33 @@ Kubernetes 部署方式请参阅 [k8s/README.md](k8s/README.md)。
 
 若使用 Qwen、DeepSeek 代理或其他 OpenAI 兼容厂商，请配置 `MODEL_PROVIDER`、`MODEL_NAME` 和 `MODEL_BASE_URL`。`MODEL_BASE_URL` 填写 API 根地址，通常为 `https://host/v1`，不要填写 `/chat/completions` 完整路径。
 
+对于默认开启思考的 OpenAI 兼容模型，可通过 `MODEL_THINKING_FORMAT` 选择控制协议：`enable_thinking`（或 `qwen`）使用 `enable_thinking` 字段；`thinking`（或 `deepseek`）使用 `thinking.type` 字段。`auto` 会优先识别平台协议：阿里云百炼/DashScope 托管的 Qwen 和 DeepSeek 模型均使用 `enable_thinking`；其他地址再按 Qwen、DeepSeek、GLM、Kimi、MiMo、MiniMax 模型标识判断。无法识别的第三方模型必须显式配置协议或使用 `none`，否则服务拒绝启动。
+
+`MODEL_THINKING_LEVEL` 控制 Pi Agent State 的思考等级，默认 `off`。`off` 配合 `thinking` 会发送 `thinking: { "type": "disabled" }`，配合 `enable_thinking` 会发送 `enable_thinking: false`。只有确实需要思考时才设置为 `low`、`medium`、`high` 等值。
+
+浙江算力 GenStudio 示例：
+
+```dotenv
+MODEL_PROVIDER=genstudio
+MODEL_NAME=deepseek-v4-flash
+MODEL_BASE_URL=https://ai.zj-computility.com/maas/v1
+MODEL_THINKING_FORMAT=thinking
+MODEL_THINKING_LEVEL=off
+```
+
+阿里云百炼（北京地域）示例：
+
+```dotenv
+MODEL_PROVIDER=bailian
+MODEL_NAME=deepseek-v4-flash
+MODEL_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+MODEL_THINKING_FORMAT=auto
+MODEL_THINKING_LEVEL=off
+MODEL_API_KEY=填写百炼APIKey
+```
+
+切换到 `qwen-flash` 只需修改 `MODEL_NAME`。百炼上两种模型关闭思考时都会发送 `enable_thinking: false`。
+
 ## 服务能力
 
 当前识别 6 类意图：

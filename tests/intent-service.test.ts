@@ -49,6 +49,11 @@ try {
   const controller = new AbortController();
   controller.abort();
   await assert.rejects(service.plan("取消", controller.signal), /cancelled/);
+
+  registration.setResponses([
+    fauxAssistantMessage("", { stopReason: "error", errorMessage: "upstream rejected request" }),
+  ]);
+  await assert.rejects(service.plan("模型错误", new AbortController().signal), /upstream rejected request/);
   console.log("intent-service.test.ts passed");
 } finally {
   registration.unregister();

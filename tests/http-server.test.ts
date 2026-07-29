@@ -11,6 +11,8 @@ const config: AppConfig = {
   modelProvider: "deepseek",
   modelName: "deepseek-v4-flash",
   modelBaseUrl: "",
+  modelThinkingFormat: "auto",
+  modelThinkingLevel: "off",
   modelApiKey: "test-only",
   intentApiToken: "test-token",
   requestTimeoutMs: 1000,

@@ -19,18 +19,55 @@ export function resolveIntentModel(config: AppConfig): Model<Api> {
 }
 
 function createOpenAiCompatibleModel(config: AppConfig): Model<"openai-completions"> {
+  const thinkingFormat = resolveThinkingFormat(config);
+  const bailianCompatible = isBailianCompatible(config);
+  if (!thinkingFormat && config.modelThinkingLevel !== "off") {
+    throw new Error("MODEL_THINKING_LEVEL requires a supported MODEL_THINKING_FORMAT for custom OpenAI-compatible models.");
+  }
+  if (!thinkingFormat && config.modelThinkingFormat !== "none") {
+    throw new Error("Unable to infer thinking control. Set MODEL_THINKING_FORMAT to thinking, enable_thinking, or none.");
+  }
   return {
     id: config.modelName,
     name: config.modelName,
     api: "openai-completions",
     provider: config.modelProvider,
     baseUrl: config.modelBaseUrl,
-    reasoning: false,
+    reasoning: thinkingFormat !== undefined,
     input: ["text"],
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
     contextWindow: 128_000,
     maxTokens: 4_096,
+    ...((thinkingFormat || bailianCompatible) ? {
+      compat: {
+        ...(thinkingFormat ? { thinkingFormat } : {}),
+        ...(bailianCompatible ? {
+          supportsDeveloperRole: false,
+          supportsStore: false,
+          maxTokensField: "max_tokens" as const,
+        } : {}),
+      },
+    } : {}),
   };
+}
+
+function resolveThinkingFormat(config: AppConfig): "qwen" | "deepseek" | undefined {
+  if (config.modelThinkingFormat === "qwen" || config.modelThinkingFormat === "enable_thinking") return "qwen";
+  if (config.modelThinkingFormat === "deepseek" || config.modelThinkingFormat === "thinking") return "deepseek";
+  if (config.modelThinkingFormat === "none") return undefined;
+
+  if (isBailianCompatible(config)) return "qwen";
+
+  const providerAndEndpoint = `${config.modelProvider}/${config.modelBaseUrl}`.toLowerCase();
+  const identifier = `${providerAndEndpoint}/${config.modelName}`.toLowerCase();
+  if (identifier.includes("qwen")) return "qwen";
+  if (/(deepseek|glm|kimi|mimo|minimax)/.test(identifier)) return "deepseek";
+  return undefined;
+}
+
+function isBailianCompatible(config: AppConfig): boolean {
+  const providerAndEndpoint = `${config.modelProvider}/${config.modelBaseUrl}`.toLowerCase();
+  return /(bailian|dashscope|aliyun|model-studio|aliyuncs\.com)/.test(providerAndEndpoint);
 }
 
 function createRequestAgent(model: Model<Api>, config: AppConfig, requestSignal: AbortSignal): Agent {
@@ -38,7 +75,7 @@ function createRequestAgent(model: Model<Api>, config: AppConfig, requestSignal:
     initialState: {
       systemPrompt: intentPlannerPrompt,
       model,
-      thinkingLevel: "off",
+      thinkingLevel: config.modelThinkingLevel,
       tools: [],
       messages: [],
     },

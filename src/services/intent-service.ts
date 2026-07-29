@@ -56,7 +56,12 @@ async function runAgentPlan(
   try {
     agent = createAgent(modelController.signal);
     await agent.prompt(message);
+    const finalMessage = agent.state.messages.at(-1);
+    if (finalMessage?.role === "assistant" && finalMessage.stopReason === "error") {
+      throw new IntentServiceError("model_error", toSafeErrorMessage(finalMessage.errorMessage));
+    }
   } catch (error) {
+    if (error instanceof IntentServiceError) throw error;
     if (requestSignal.aborted || executionSignal.aborted || modelController.signal.aborted) {
       throw new IntentServiceError("aborted", "Request was cancelled.");
     }
@@ -75,5 +80,6 @@ async function runAgentPlan(
 }
 
 function toSafeErrorMessage(error: unknown): string {
+  if (typeof error === "string") return error.slice(0, 200);
   return error instanceof Error ? error.message.slice(0, 200) : "Model request failed.";
 }

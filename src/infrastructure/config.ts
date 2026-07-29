@@ -4,6 +4,8 @@ export type AppConfig = {
   modelProvider: string;
   modelName: string;
   modelBaseUrl: string;
+  modelThinkingFormat: ModelThinkingFormat;
+  modelThinkingLevel: ModelThinkingLevel;
   modelApiKey: string;
   intentApiToken: string;
   requestTimeoutMs: number;
@@ -14,6 +16,9 @@ export type AppConfig = {
   queueTimeoutMs: number;
 };
 
+export type ModelThinkingFormat = "auto" | "enable_thinking" | "thinking" | "qwen" | "deepseek" | "none";
+export type ModelThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
     host: env.HOST?.trim() || "0.0.0.0",
@@ -21,6 +26,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     modelProvider: env.MODEL_PROVIDER?.trim() || "deepseek",
     modelName: env.MODEL_NAME?.trim() || "deepseek-v4-flash",
     modelBaseUrl: readOptionalHttpUrl(env.MODEL_BASE_URL),
+    modelThinkingFormat: readModelThinkingFormat(env.MODEL_THINKING_FORMAT),
+    modelThinkingLevel: readModelThinkingLevel(env.MODEL_THINKING_LEVEL),
     modelApiKey: env.MODEL_API_KEY?.trim() || env.DEEPSEEK_API_KEY?.trim() || "",
     intentApiToken: env.INTENT_API_TOKEN?.trim() || "",
     requestTimeoutMs: readPositiveInteger(env.REQUEST_TIMEOUT_MS, 10_000),
@@ -30,6 +37,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     maxQueueSize: readPositiveInteger(env.MAX_QUEUE_SIZE, 500),
     queueTimeoutMs: readPositiveInteger(env.QUEUE_TIMEOUT_MS, 30_000),
   };
+}
+
+function readModelThinkingLevel(value: string | undefined): ModelThinkingLevel {
+  const level = value?.trim().toLowerCase() || "off";
+  if (level === "off" || level === "minimal" || level === "low" || level === "medium" || level === "high" || level === "xhigh" || level === "max") return level;
+  throw new Error("MODEL_THINKING_LEVEL must be off, minimal, low, medium, high, xhigh, or max.");
+}
+
+function readModelThinkingFormat(value: string | undefined): ModelThinkingFormat {
+  const format = value?.trim().toLowerCase() || "auto";
+  if (format === "auto" || format === "enable_thinking" || format === "thinking" || format === "qwen" || format === "deepseek" || format === "none") return format;
+  throw new Error("MODEL_THINKING_FORMAT must be auto, enable_thinking, thinking, qwen, deepseek, or none.");
 }
 
 function readOptionalHttpUrl(value: string | undefined): string {
